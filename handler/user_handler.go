@@ -12,7 +12,6 @@ type UserHandler struct {
 	repo repository.UserRepository
 }
 
-
 func NewUserHandler(repo repository.UserRepository) *UserHandler {
 	return &UserHandler{repo: repo}
 }
@@ -24,6 +23,15 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, users)
+}
+
+func (h *UserHandler) GetUsersByID(c *gin.Context) {
+	id, err := c.Param("id")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	users, err := h.repo.GetByID(id)
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {

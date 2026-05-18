@@ -4,20 +4,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/thesunonthesky/GoBackendPackage/repository"
 	"github.com/thesunonthesky/GoBackendPackage/handler"
-	"log"
+	// "log"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
+	// "github.com/jmoiron/sqlx"
 )
 
 
 func main(){
-	dsn := "root:password@tcp(127.0.0.1:3306)/my_database"
-	db,err := sqlx.Connect("mysql",dsn)
-	if err != nil{
-		log.Fatalln(err)
-	}
+	// dsn := "root:password@tcp(127.0.0.1:3306)/my_database"
+	// db,err := sqlx.Connect("mysql",dsn)
+	// if err != nil{
+	// 	log.Fatalln(err)
+	// }
 
-	userRepo := repository.NewUserRepositoryDB(db)
+	userRepo := repository.NewUserRepositoryDB(nil)
 	userHandler := handler.NewUserHandler(userRepo)
 
 	r := gin.Default()
