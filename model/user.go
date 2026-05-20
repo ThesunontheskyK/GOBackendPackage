@@ -8,6 +8,12 @@ type User struct {
 	Password string `json:"password" db:"password"`
 }
 
+type Userinfo struct {
+	ID    int    `json:"id" db:"id"`
+	Name  string `json:"name" db:"name"`
+	Email string `json:"email" db:"email"`
+}
+
 type CreateUser struct{
 	Name string `json:"name" binding:"required"`
 	Email string `json:"email" binding:"required,email"`

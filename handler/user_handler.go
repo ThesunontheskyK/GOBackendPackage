@@ -33,7 +33,16 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, users)
+	response :=[]model.Userinfo{}
+	for _,user := range users{
+		res := model.Userinfo{
+			ID:user.ID,
+			Name:user.Name,
+			Email:user.Email,
+		}
+		response = append(response, res)
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) GetUsersByID(c *gin.Context) {
@@ -52,38 +61,45 @@ func (h *UserHandler) GetUsersByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	response :=model.Userinfo{
+		ID: users.ID,
+		Name:users.Name,
+		Email:users.Email,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req model.CreateUser
 	if err := c.ShouldBindJSON(&req); err != nil {
 		if validationErrs, ok := err.(validator.ValidationErrors); ok {
-			var errMessage string
+			details := make(map[string]string)
+
 			for _, vErr := range validationErrs {
 				switch vErr.Field() {
 				case "Name":
-					errMessage += "กรุณากรอกชื่อ | "
+					details[vErr.Field()] = "กรุณากรอกชื่อ"
 				case "Email":
 					if vErr.Tag() == "required" {
-						errMessage += "กรุณากรอกอีเมล | "
+						details[vErr.Field()] = "กรุณากรอกอีเมล"
 					} else if vErr.Tag() == "email" {
-						errMessage += "รูปแบบอีเมลไม่ถูกต้อง | "
+						details[vErr.Field()] = "รูปแบบอีเมลไม่ถูกต้อง"
 					}
 				case "Password":
 					if vErr.Tag() == "min" {
-						errMessage += "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร | "
+						details[vErr.Field()] = "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"
 					} else {
-						errMessage += "กรุณากรอกรหัสผ่าน | "
+						details[vErr.Field()] = "กรุณากรอกรหัสผ่าน"
 					}
 				}
 			}
-			handleError(c, errs.NewBadRequestError(errMessage))
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "กรุณากรอกข้อมูลให้ถูกต้อง",
+				"details": details,
+			})
 			return
 		}
-		
-		handleError(c, errs.NewBadRequestError("รูปแบบข้อมูลไม่ถูกต้อง"))
-		return
 	}
 
 	user := model.User{
